@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Theme Made By www.w3schools.com -->
+  <title>FEEDBACK(Sentiment Analyzer)</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <style>
+  body {
+    font: 400 15px Lato, sans-serif;
+    line-height: 1.8;
+    color: #818181;
+  }
+  h2 {
+    font-size: 24px;
+    text-transform: uppercase;
+    color: #303030;
+    font-weight: 600;
+    margin-bottom: 30px;
+  }
+  h4 {
+    font-size: 19px;
+    line-height: 1.375em;
+    color: #303030;
+    font-weight: 400;
+    margin-bottom: 30px;
+  }
+  .jumbotron {
+    background-color: #f4511e;
+    color: #fff;
+    padding: 100px 25px;
+    font-family: Montserrat, sans-serif;
+  }
+  .container-fluid {
+    padding: 60px 50px;
+  }
+  .bg-grey {
+    background-color: #f6f6f6;
+  }
+  .logo-small {
+    color: #f4511e;
+    font-size: 50px;
+  }
+  .logo {
+    color: #f4511e;
+    font-size: 200px;
+  }
+  .thumbnail {
+    padding: 0 0 15px 0;
+    border: none;
+    border-radius: 0;
+  }
+  .thumbnail img {
+    width: 100%;
+    height: 400px;
+    margin-bottom: 10px;
+  }
+  .carousel-control.right, .carousel-control.left {
+    background-image: none;
+    color: #f4511e;
+  }
+  .carousel-indicators li {
+    border-color: #f4511e;
+  }
+  .carousel-indicators li.active {
+    background-color: #f4511e;
+  }
+  .item h4 {
+    font-size: 19px;
+    line-height: 1.375em;
+    font-weight: 400;
+    font-style: italic;
+    margin: 70px 0;
+  }
+  .item span {
+    font-style: normal;
+  }
+  .panel {
+    border: 1px solid #f4511e;
+    border-radius:0 !important;
+    transition: box-shadow 0.5s;
+  }
+  .panel:hover {
+    box-shadow: 5px 0px 40px rgba(0,0,0, .2);
+  }
+  .panel-footer .btn:hover {
+    border: 1px solid #f4511e;
+    background-color: #fff !important;
+    color: #f4511e;
+  }
+  .panel-heading {
+    color: #fff !important;
+    background-color: #f4511e !important;
+    padding: 25px;
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+  .panel-footer {
+    background-color: white !important;
+  }
+  .panel-footer h3 {
+    font-size: 32px;
+  }
+  .panel-footer h4 {
+    color: #aaa;
+    font-size: 14px;
+  }
+  .panel-footer .btn {
+    margin: 15px 0;
+    background-color: #f4511e;
+    color: #fff;
+  }
+  .navbar {
+    margin-bottom: 0;
+    background-color: #f4511e;
+    z-index: 9999;
+    border: 0;
+    font-size: 12px !important;
+    line-height: 1.42857143 !important;
+    letter-spacing: 4px;
+    border-radius: 0;
+    font-family: Montserrat, sans-serif;
+  }
+  .navbar li a, .navbar .navbar-brand {
+    color: #fff !important;
+  }
+  .navbar-nav li a:hover, .navbar-nav li.active a {
+    color: #f4511e !important;
+    background-color: #fff !important;
+  }
+  .navbar-default .navbar-toggle {
+    border-color: transparent;
+    color: #fff !important;
+  }
+  footer .glyphicon {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #f4511e;
+  }
+  .slideanim {visibility:hidden;}
+  .slide {
+    animation-name: slide;
+    -webkit-animation-name: slide;
+    animation-duration: 1s;
+    -webkit-animation-duration: 1s;
+    visibility: visible;
+  }
+  @keyframes slide {
+    0% {
+      opacity: 0;
+      transform: translateY(70%);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0%);
+    }
+  }
+  @-webkit-keyframes slide {
+    0% {
+      opacity: 0;
+      -webkit-transform: translateY(70%);
+    }
+    100% {
+      opacity: 1;
+      -webkit-transform: translateY(0%);
+    }
+  }
+  @media screen and (max-width: 768px) {
+    .col-sm-4 {
+      text-align: center;
+      margin: 25px 0;
+    }
+    .btn-lg {
+      width: 100%;
+      margin-bottom: 35px;
+    }
+  }
+  @media screen and (max-width: 480px) {
+    .logo {
+      font-size: 150px;
+    }
+  }
+   function fillCategory() {
+    let dropdown = document.getElementById("category");
+    let selectedValue = dropdown.value;
+
+    console.log("Category Selected:", selectedValue);  // Debugging log
+
+    if (selectedValue) {
+      document.getElementById("selected-category").value = selectedValue;
+      dropdown.style.display = "none";  // Hide dropdown after selection
+    }
+  }
+
+  function setFeedback(feedbackType) {
+    document.getElementById("selected-feedback").value = feedbackType;
+
+    // Highlight the selected feedback button
+    let buttons = document.querySelectorAll("#feedback-buttons button");
+    buttons.forEach(btn => btn.style.opacity = "0.5"); // Dim all buttons
+    event.target.style.opacity = "1"; // Highlight selected button
+
+    console.log("Feedback Selected:", feedbackType);  // Debugging log
+  }
+    .navbar-brand img {
+    vertical-align: middle;
+    margin-top:0px;
+    border-radius: 5px; /* Optional: Adds rounded corners */
+}
+  </style>
+</head>
+<body id="myPage" data-spy="scroll" data-target=".navbar" data-offset="60">
+
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="BackFeed Logo" height="30">
+<!--    <span style="font-weight: bold; font-size: 20px; color: white; margin-left: 5px;">BackFeed</span>-->
+</a>
+
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#about">ABOUT</a></li>
+        <li><a href="#services">SENTIMENTS</a></li>
+        <li><a href="#portfolio">REVIEWS</a></li>
+        <li><a href="#pricing">PRODUCTS</a></li>
+        <li><a href="#contact">CONTACT</a></li>
+
+        {% if name %}
+        <li><a href="{{ url_for('logout') }}">LOGOUT ({{ name }})</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="jumbotron text-center">
+  <h1>Welcome User!</h1>
+  <p>Ready to give your feedback</p>
+
+  <form method="post" action="/">
+    <!-- Dropdown for category selection -->
+    <div class="form-group" id="dropdown-container">
+      <label for="category">Select Product:</label>
+      <select name='category' id="category" class="form-control" onchange="fillCategory()">
+        <option value="" disabled selected>Choose a product</option>
+        <option value="boAT Daily Activity Tracker.." >boAT Daily Activity Tracker..</option>
+
+        <option value="OnePlus Wireless Earphones..  ">OnePlus Wireless Earphones..  </option>
+        <option value="Acnos Kids Digital Watch.. ">Acnos Kids Digital Watch.. </option>
+        <option value="HP Wireless Earbuds.. ">HP Wireless Earbuds.. </option>
+        <option value="Xioami Home Security Camera..">Xioami Home Security Camera..</option>
+        <option value="Apple Macbook Air Laptop.. ">Apple Macbook Air Laptop.. </option>
+        <option value="Nikon Digital SLR Camera..  ">Nikon Digital SLR Camera..  </option>
+        <option value="Samsung HD Smart LED(32 inches).. ">Samsung HD Smart LED(32 inches).. </option>
+        <option value="OnePlus 13 Mobile Phone.. ">OnePlus 13 Mobile Phone.. </option>
+        <option value="Plastic Vegetable Chopper.. ">Plastic Vegetable Chopper.. </option>
+        <option value="Stainless Steel Chopping Board.. ">Stainless Steel Chopping Board.. </option>
+        <option value="Fridge Storage Containers.. ">Fridge Storage Containers.. </option>
+        <option value="Prestige LPG Gas Stove.. ">Prestige LPG Gas Stove.. </option>
+        <option value="Dish Washing Gloves..">Dish Washing Gloves..</option>
+        <option value="Panasonic Microwave Oven.. ">Panasonic Microwave Oven.. </option>
+        <option value="Bamboo Fibre Dinner Plates.. ">Bamboo Fibre Dinner Plates.. </option>
+        <option value="Whirlpool Refrigerator..">Whirlpool Refrigerator..</option>
+        <option value="Stainless Steel Knife Set..">Stainless Steel Knife Set..</option>
+        <option value="CeraVe Skin Cleanser..">CeraVe Skin Cleanser..</option>
+        <option value="Olay Retinol Night Cream.. ">Olay Retinol Night Cream.. </option>
+        <option value="Cosrx Advanced Snail Mucin..">Cosrx Advanced Snail Mucin..</option>
+        <option value="Plum Green Tea Night Gel..">Plum Green Tea Night Gel..</option>
+        <option value="The Derma Co Sunscreen gel..">The Derma Co Sunscreen gel..</option>
+        <option value="Emolene Moisturising Cream..">Emolene Moisturising Cream..</option>
+        <option value="Garnier Skin Naturals Face Serum..">Garnier Skin Naturals Face Serum..</option>
+        <option value="LANEIGE Sleeping Mask..">LANEIGE Sleeping Mask..</option>
+        <option value="Foxtale De-Tan Face Mask..">Foxtale De-Tan Face Mask..</option>
+      </select>
+    </div>
+
+    <!-- Hidden input to store selected category -->
+    <input type="hidden" name="category" id="selected-category">
+
+    <!-- Feedback Buttons (Initially Hidden) -->
+    <div id="feedback-buttons" style="margin-top: 10px;">
+      <p><strong>Select Your Feedback:</strong></p>
+      <button type="button" class="btn btn-success" onclick="setFeedback('Excellent')">Excellent</button>
+      <button type="button" class="btn btn-primary" onclick="setFeedback('Good')">Good</button>
+      <button type="button" class="btn btn-warning" onclick="setFeedback('Bad')">Bad</button>
+      <button type="button" class="btn btn-danger" onclick="setFeedback('Disappointing')">Disappointing</button>
+    </div>
+
+    <!-- Hidden input to store feedback type -->
+    <input type="hidden" name="feedback" id="selected-feedback">
+
+    <!-- Input for user statement -->
+    <div class="input-group">
+      <input type="text" name="text" class="form-control" size="100" placeholder="More about the product" required>
+      <div class="input-group-btn">
+        <button type="submit" class="btn btn-danger">Submit</button>
+      </div>
+    </div>
+  </form>
+
+  {% if sentiment %}
+    <div class="result">
+<!--      <p><strong>Product:</strong> {{ category if category else 'Not selected' }}</p>-->
+      <p><strong>More:</strong> {{ feedback if feedback else 'No feedback given' }}</p>
+      <p><strong>Sentiment:</strong> {{ sentiment if sentiment else 'Not analyzed yet' }}</p>
+
+    </div>
+  {% endif %}
+</div>
+
+<!-- Container (About Section) -->
+<div id="about" class="container-fluid">
+  <div class="row">
+    <div class="col-sm-8">
+      <h2>About Company Page</h2><br>
+      <h4>Welcome to BackFeed – Transforming Customer Insights with AI!  We believe that every piece of feedback matters, and with our intelligent system, businesses can improve their products, services, and customer satisfaction.</h4><br>
+      <p>"We've been using BackFeed for analyzing customer feedback, and it's been a game-changer! We can now quickly identify issues and improve our products based on real-time insights." – John D., CEO of RetailPro</p>
+      <br><button class="btn btn-default btn-lg">Get in Touch</button>
+    </div>
+    <div class="col-sm-4">
+      <span class="glyphicon glyphicon-signal logo"></span>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid bg-grey">
+  <div class="row">
+    <div class="col-sm-4">
+      <span class="glyphicon glyphicon-globe logo slideanim"></span>
+    </div>
+    <div class="col-sm-8">
+      <h2>Our Values</h2><br>
+      <h4><strong>MISSION:</strong> Our mission is to empower businesses with AI-driven feedback analysis to enhance customer satisfaction, improve decision-making, and drive growth.We believe that every review, comment, and feedback holds valuable insights. </h4><br>
+      <p><strong>VISION:</strong> Our vision is to be the global leader in AI-powered analysis, revolutionizing the way businesses interact with their customers.We envision a world where:
+🌍 Every business can understand customer feedbacks effortlessly
+💡 AI-driven insights shape better customer experiences
+📈 Companies use real-time feedback analysis to innovate and grow
+
+By continuously advancing our technology, accuracy, and ease of use, we aim to create a future where businesses and customers connect more meaningfully through intelligent feedback analysis.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Container (Services Section) -->
+<div id="services" class="container-fluid text-center">
+  <h2>SENTIMENTS</h2>
+  <h4>These are the sentiments</h4>
+  <br>
+  <div class="row slideanim">
+    <div class="col-sm-4">
+      <span class="glyphicon glyphicon-off logo-small"></span>
+      <h4>Negative</h4>
+      <p></p>
+    </div>
+    <div class="col-sm-4">
+      <span class="glyphicon glyphicon-heart logo-small"></span>
+      <h4>Very Positive</h4>
+      <p></p>
+    </div>
+    <div class="col-sm-4">
+      <span class="glyphicon glyphicon-lock logo-small"></span>
+      <h4>Neutral</h4>
+      <p></p>
+    </div>
+  </div>
+  <br><br>
+  <div class="row slideanim">
+    <div class="col-sm-4">
+      <span class="glyphicon glyphicon-leaf logo-small"></span>
+      <h4>Positive</h4>
+      <p></p>
+    </div>
+    <div class="col-sm-4">
+      <span class="glyphicon glyphicon-certificate logo-small"></span>
+      <h4>Very Negative</h4>
+      <p></p>
+    </div>
+<!--    <div class="col-sm-4">-->
+<!--      <span class="glyphicon glyphicon-wrench logo-small"></span>-->
+<!--      <h4 style="color:#303030;">HARD WORK</h4>-->
+<!--      <p>Lorem ipsum dolor sit amet..</p>-->
+<!--    </div>-->
+  </div>
+</div>
+
+<!-- Container (Portfolio Section) -->
+<div id="portfolio" class="container-fluid text-center bg-grey">
+  <h2>Reviews</h2><br>
+  <h4>How are you feeling?</h4>
+  <div class="row text-center slideanim">
+    <div class="col-sm-4">
+      <div class="thumbnail">
+        <img src="https://img.freepik.com/premium-photo/happy-orange-fruit-cartoon-character-generative-ai_634358-545.jpg?w=740" alt="Paris" width="400" height="300">
+        <p><strong>I'm happy</strong></p>
+        <p></p>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="thumbnail">
+        <img src="https://img.freepik.com/premium-photo/funny-orange-character-isolated-empty-background_168310-288.jpg?w=360" alt="New York" width="400" height="300">
+        <p><strong>I'm neutral</strong></p>
+        <p></p>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="thumbnail">
+        <img src="https://img.freepik.com/premium-photo/orange-cartoon-character_625492-1678.jpg" alt="San Francisco" width="400" height="300">
+        <p><strong>I'm sad</strong></p>
+        <p></p>
+      </div>
+    </div>
+  </div><br>
+
+  <h2>What our customers say</h2>
+  <div id="myCarousel" class="carousel slide text-center" data-ride="carousel">
+    <!-- Indicators -->
+    <ol class="carousel-indicators">
+      <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+      <li data-target="#myCarousel" data-slide-to="1"></li>
+      <li data-target="#myCarousel" data-slide-to="2"></li>
+    </ol>
+
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner" role="listbox">
+      <div class="item active">
+        <h4>"This company is the best. I am so happy with the result!"<br><span>Michael Roe, Vice President, Comment Box</span></h4>
+      </div>
+      <div class="item">
+        <h4>"One word... WOW!!"<br><span>John Doe, Salesman, Rep Inc</span></h4>
+      </div>
+      <div class="item">
+        <h4>"Could I... BE any more happy with this company?"<br><span>Chandler Bing, Actor, FriendsAlot</span></h4>
+      </div>
+    </div>
+
+    <!-- Left and right controls -->
+    <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+      <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+      <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+    </a>
+  </div>
+</div>
+
+<!-- Container (Pricing Section) -->
+<div id="pricing" class="container-fluid">
+  <div class="text-center">
+    <h2>Products</h2>
+    <h4>Overview of the products that you can give feedbacks on</h4>
+  </div>
+  <div class="row slideanim">
+    <div class="col-sm-4 col-xs-12">
+      <div class="panel panel-default text-center">
+        <div class="panel-heading">
+          <h1>Electronics</h1>
+        </div>
+        <div class="panel-body">
+          <p><strong>boAT Daily Activity Tracker..</strong> &nbsp;<a href="https://www.amazon.in/boAt-Storm-Call-Navigation-Bluetooth/dp/B0D5LRGSCR/ref=sxin_15_pa_sp_search_thematic_sspa?content-id=amzn1.sym.cd33fa60-47cd-49f3-80b8-24b1f0cbef97%3Aamzn1.sym.cd33fa60-47cd-49f3-80b8-24b1f0cbef97&crid=WPUZH2F9YQFI&cv_ct_cx=electronics&keywords=electronics&pd_rd_i=B0D5LRGSCR&pd_rd_r=7ae1a1d5-eec5-4be8-afb7-614edb73abd4&pd_rd_w=zmTCe&pd_rd_wg=tnDcC&pf_rd_p=cd33fa60-47cd-49f3-80b8-24b1f0cbef97&pf_rd_r=5MXZDKXSCT79Y5K47XPZ&qid=1740889823&sbo=RZvfv%2F%2FHxDF%2BO5021pAnSA%3D%3D&sprefix=electronics%2Caps%2C368&sr=1-2-ced4eeeb-b190-41d6-902a-1ecb3fb8b7c4-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9zZWFyY2hfdGhlbWF0aWM&th=1" target="_blank"><button>Link</button></a></p>
+          <p><strong>OnePlus Wireless Earphones..</strong> &nbsp; <a href="https://www.amazon.in/Oneplus-Bluetooth-Wireless-Earphones-Bombastic/dp/B09TVVGXWS/ref=sr_1_18?crid=WPUZH2F9YQFI&dib=eyJ2IjoiMSJ9.FK_zC2ouLjD-ROf9vSPR6V4vojIJRsdgBqZWPQ2OMEq9NsGSTQyH-PUAXlETMMQ84ntzChHMFKY57g2C-HrX3YVpb1ddAd08xKXbL8i9mK0ZnuvchrPUh1vT5gjxS2i8DlpE1Vi9Us9YmYSEkJzEtFsXBqg3f23XR8-dinwI10x8wWOGPOFzIxW1FDtOE5ZWNCD0S2VDuPDjVJxYhlHpqRRS9D-I0Qnw5w76WGmLS_s_dFGNjmMXSEIb2cFja_TQ1KXu7kED3Iz7IDyRTQnYf6aGxgSv4vPx37lbFA3CzvmmERp3oFrI2CoZ8u5qDRhUuD5k4RYqvOUtifycaFaKoRIypygdy_GUYd_dV1skglwpU7hkBGDStC47W6UQHStITuOHV4IuNVbOZI92U9uP-H7wjK774C5DXeMlgs-EYl-YYx_pfpPOlAhVn1O6MTqJ.eFqCIEKp-KI03cDYsmIKcB97lm8E3yMyQ9r57AxTsUs&dib_tag=se&keywords=electronics&qid=1740889823&sprefix=electronics%2Caps%2C368&sr=8-18&th=1" target="_blank"><button>Link</button></a></p>
+          <p><strong>Acnos Kids Digital Watch..</strong> &nbsp; <a href="https://www.amazon.in/Acnos-Luminous-Fashionable-Waterproof-Electronic/dp/B0CDPD51YY/ref=sr_1_39?crid=WPUZH2F9YQFI&dib=eyJ2IjoiMSJ9.FK_zC2ouLjD-ROf9vSPR6V4vojIJRsdgBqZWPQ2OMEq9NsGSTQyH-PUAXlETMMQ84ntzChHMFKY57g2C-HrX3YVpb1ddAd08xKXbL8i9mK0ZnuvchrPUh1vT5gjxS2i8DlpE1Vi9Us9YmYSEkJzEtFsXBqg3f23XR8-dinwI10x8wWOGPOFzIxW1FDtOE5ZWNCD0S2VDuPDjVJxYhlHpqRRS9D-I0Qnw5w76WGmLS_s_dFGNjmMXSEIb2cFja_TQ1KXu7kED3Iz7IDyRTQnYf6aGxgSv4vPx37lbFA3CzvmmERp3oFrI2CoZ8u5qDRhUuD5k4RYqvOUtifycaFaKoRIypygdy_GUYd_dV1skglwpU7hkBGDStC47W6UQHStITuOHV4IuNVbOZI92U9uP-H7wjK774C5DXeMlgs-EYl-YYx_pfpPOlAhVn1O6MTqJ.eFqCIEKp-KI03cDYsmIKcB97lm8E3yMyQ9r57AxTsUs&dib_tag=se&keywords=electronics&qid=1740889823&sprefix=electronics%2Caps%2C368&sr=8-39" target="_blank"><button>Link</button></a></p>
+          <p><strong>HP Wireless Earbuds..</strong> &nbsp; <a href="https://www.amazon.in/HP-Compatible-Smartphones-Bluetooth-Noise-Reduction/dp/B0D6NMXQ2V/ref=sr_1_26?crid=WPUZH2F9YQFI&dib=eyJ2IjoiMSJ9.FK_zC2ouLjD-ROf9vSPR6V4vojIJRsdgBqZWPQ2OMEq9NsGSTQyH-PUAXlETMMQ84ntzChHMFKY57g2C-HrX3YVpb1ddAd08xKXbL8i9mK0ZnuvchrPUh1vT5gjxS2i8DlpE1Vi9Us9YmYSEkJzEtFsXBqg3f23XR8-dinwI10x8wWOGPOFzIxW1FDtOE5ZWNCD0S2VDuPDjVJxYhlHpqRRS9D-I0Qnw5w76WGmLS_s_dFGNjmMXSEIb2cFja_TQ1KXu7kED3Iz7IDyRTQnYf6aGxgSv4vPx37lbFA3CzvmmERp3oFrI2CoZ8u5qDRhUuD5k4RYqvOUtifycaFaKoRIypygdy_GUYd_dV1skglwpU7hkBGDStC47W6UQHStITuOHV4IuNVbOZI92U9uP-H7wjK774C5DXeMlgs-EYl-YYx_pfpPOlAhVn1O6MTqJ.eFqCIEKp-KI03cDYsmIKcB97lm8E3yMyQ9r57AxTsUs&dib_tag=se&keywords=electronics&qid=1740889823&sprefix=electronics%2Caps%2C368&sr=8-26&th=1" target="_blank"><button>Link</button></a></p>
+          <p><strong>Xioami Home Security Camera..</strong> &nbsp; <a href="https://www.amazon.in/Xiaomi-Security-Aperture-Superior-Feature/dp/B0CS9S7X53/ref=sr_1_11?crid=1UGW7Z1EBVQYO&dib=eyJ2IjoiMSJ9.bEKSRBruVCZoJnJBo-MpM2PhilLa5AHY23swkqz0h6M3fYkhOzKcN2C4QXcbrYFJZ9Rm8hTAlArtBVenFekZKGid_WMhGCW9Rbprpsb2IGqfc52v5KwMj8hWHxdfUArYat0rd7mJ6QAJJXmFug7GEyFnQ3_R23CiZ6QZaFba5anPcBYtLNFVUb-GfKApY_ubnhtX9zb7HPZb2lJdmr1JRlwnqdLgmB2v2zXVuCx1vG7UVjGPHuwMAn22SUjY60PSRcGkd4VyWFe-5jqmDx9fyD-XjOxKmCjSpdm4vyC4d7oNCnRDgeihnMUjvGl9dNVJhHAuMtT2sjAaASxYxNw-oC_ez9JxET-dT754Crk1uOAOASgzgmwJhpRcKJ6LyY5WtIrtq05nMfT-oJWPosun0mbCSKNrKmFBMJHgQmM5A60d-a8iBSRXjCBmCRUt_bsC.GML1CBRQXo1CSBRuAvs7s5zLvMxFS61HK1G2BwBRt8E&dib_tag=se&keywords=camera&qid=1740893448&sprefix=camera%2Caps%2C278&sr=8-11" target="_blank"><button>Link</button></a></p>
+          <p><strong>Apple Macbook Air Laptop..</strong> &nbsp; <a href="https://www.amazon.in/Apple-MacBook-Chip-13-inch-256GB/dp/B08N5W4NNB/ref=sr_1_5?crid=3F76RZY8LAI3T&dib=eyJ2IjoiMSJ9.RXkIJXGcyrRHMC07itcaEFD84cVNlAtA9l7X5VEk77L9Nh1XhNaPL3FPIEG8eE3zsnr8r-HlOm1Rfw5-3N2TBu-NbOqrTOvyunBtkyslC0pNwhXLmXVeQk8uOzxxf5epB8V4lGJub42OkK6OWccsicWy--YYIpoK7oiafTL_J7d9FUtKKgFOmYNwnpYji44QWtKPTHWCFLjIjq14MNuTi43kRk8hEb_pnBDH0LuZs98.Knz2XU71JaL8W8DY4ioskxPIms1pOrJeGkEkOeaTp28&dib_tag=se&keywords=laptop&qid=1740894028&sprefix=laptop%2Caps%2C342&sr=8-5&th=1" target="_blank"><button>Link</button></a><p>
+          <p><strong>Nikon Digital SLR Camera..</strong> &nbsp; <a href="https://www.amazon.in/Nikon-20-9MP-Camera-18-140mm-3-5-5-6G/dp/B06Y5RTN1T/ref=sr_1_3?crid=29WFQX0K2BOPS&dib=eyJ2IjoiMSJ9.W5u1se21LfawQnWrQrIIeNBktP3-6zNwf-J3WBFE1-CEUmLMCRFAXa-RS2IMi4q9DWlVAasE7J84wFR-09dbh4SoLLs6PLhcfld4u0O0ZaSBvAh4iAAuF2AUbqWAUzYmqztkkfO9Wre_WTKyYumSJxEro7DPpbqs8l0TCMyQPM8ka1o_iGg_vxp11hTUI3MGxjfSfW6gIefCorlIwd-n4yektBj3IJg4lTt-_h4U56U.Pgvmdxj5_jkzJVPztwXwmYDLoFM2uQEQt1x4bNP8j4o&dib_tag=se&keywords=dslr+camera&qid=1740894136&sprefix=dslr%2Caps%2C369&sr=8-3" target="_blank"><button>Link</button></a><p>
+          <p><strong>Samsung HD Smart LED(32 inches)..</strong> &nbsp; <a href="https://www.amazon.in/Samsung-inches-Ready-UA32T4380AKXXL-Glossy/dp/B0B8YTGC23/ref=sr_1_2_sspa?crid=QTJKCWKW9H86&dib=eyJ2IjoiMSJ9.xJ2ZguwkpoDumpa_oUJ6cUsn6CjuD_RldpA-hmPB_b29Qe4_r1LeWDu-XN6aoE4_6TVijxJo_Fte2-dz8zJoSPYRNnmH88Pu8s3zgAK4umWyQIqq-dAocG2EB9GdGDy0Dq4a1KA0yxVoMpAQ8LmsErl5TKjz6FzkK5auHNCJ4MoXnYdhlKDBshVkKUpJ6ymA9Rh6o6GCXyZz3BZ65vYNCTcZfEqjxHxBWE5Nil5OmpE.omWkyuRHBLNr7888b8In2GfI_ZzZpxxpzqrhO2NtZ3k&dib_tag=se&keywords=television%2B32%2Binch&qid=1740894206&sprefix=television%2Caps%2C293&sr=8-2-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&th=1" target="_blank"><button>Link</button></a><p>
+          <p><strong>OnePlus 13 Mobile Phone..</strong> &nbsp; <a href="https://www.amazon.in/OnePlus-Smarter-256GB-Storage-Midnight/dp/B0DPS7FB4J/ref=sr_1_21_sspa?crid=2ASYYBCZW7V2M&dib=eyJ2IjoiMSJ9.IjK29lEq4zL5iKz3aJTLJi_VEppnaKKdOjKe6tFbT9tqQZu10NYUMWu_F9B3sn_2P3VlDUJ_6QqmY4lFU4C9Kwr577MSCqHYeirhUMF9H-0YeQXcUccvOe9PIozmr8WwiVZDsSQRNXp42XFiYniLmqe9K9010mkBhCyDOIh8G5nV6qQCuTwK4thjcjsRzAVv5ZPiwDF7X4ldRezSe5mCdLUy91g-VGsnKEREoxMboMY.yJvP24XtmGNfShvGerFkOKqT4gqVG_lWiSXXc89abng&dib_tag=se&keywords=phone&qid=1740894399&sprefix=%2Caps%2C321&sr=8-21-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9idGY&psc=1" target="_blank"><button>Link</button></a><p>
+        </div>
+<!--        <div class="panel-footer">-->
+<!--          <h3>$19</h3>-->
+<!--          <h4>per month</h4>-->
+<!--          <button class="btn btn-lg">Sign Up</button>-->
+<!--        </div>-->
+      </div>
+    </div>
+    <div class="col-sm-4 col-xs-12">
+      <div class="panel panel-default text-center">
+        <div class="panel-heading">
+          <h1>Kitchen</h1>
+        </div>
+        <div class="panel-body">
+          <p><strong>Plastic Vegetable Chopper..</strong>&nbsp; <a href="https://www.amazon.in/Butterfly-Premium-Vegetable-Chopper-Blue/dp/B084M1VLZ3/ref=sr_1_3_sspa?crid=2CFSOURX51NST&dib=eyJ2IjoiMSJ9.CGJXLNmwzNDfdv572FybsQM0WPTcpKIaIf0D-1UoJ1ME6UcALBCSFm96XzNOZb1-kmjJds3jutZhDDqv36atXCm9LSVevbiDFT-TEUO_MisZFXhH58p3s-D3E-l3tppF6w1vTAiI1NedVgRPnYiHqyulfpov4s-ClEFw5UY9uQgXmrb5zzfTnh39asciR8aqw5ApgwEE-AakiRpoINCJiKgBp5okrDrXxfqvjR0471k6VsT82SQ2EDeYDRkzbE0c6l6goiNEX4BgMGnPk7GRhTm3IzWF5-0AstbygOHR8wE.2S47jO8ISW2suaOdF5d5kHgvejUTL5bPtROnuNLSS9E&dib_tag=se&keywords=kitchen%2Bessentials&nsdOptOutParam=true&qid=1740897130&sprefix=kitchen%2Bessen%2Caps%2C288&sr=8-3-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&th=1" target="_blank"><button>Link</button></a></p>
+          <p><strong>Stainless Steel Chopping Board..</strong>&nbsp; <a href="https://www.amazon.in/JOYFUL-CHEF-Ultra-Durable-Heavy-Duty-Vegetables/dp/B0DTPK616J/ref=sr_1_1_sspa?crid=2CFSOURX51NST&dib=eyJ2IjoiMSJ9.CGJXLNmwzNDfdv572FybsQM0WPTcpKIaIf0D-1UoJ1ME6UcALBCSFm96XzNOZb1-kmjJds3jutZhDDqv36atXCm9LSVevbiDFT-TEUO_MisZFXhH58p3s-D3E-l3tppF6w1vTAiI1NedVgRPnYiHqyulfpov4s-ClEFw5UY9uQgXmrb5zzfTnh39asciR8aqw5ApgwEE-AakiRpoINCJiKgBp5okrDrXxfqvjR0471k6VsT82SQ2EDeYDRkzbE0c6l6goiNEX4BgMGnPk7GRhTm3IzWF5-0AstbygOHR8wE.2S47jO8ISW2suaOdF5d5kHgvejUTL5bPtROnuNLSS9E&dib_tag=se&keywords=kitchen%2Bessentials&nsdOptOutParam=true&qid=1740897130&sprefix=kitchen%2Bessen%2Caps%2C288&sr=8-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&th=1" target="_blank"><button>Link</button></a></p>
+          <p><strong>Fridge Storage Containers..</strong> &nbsp;<a href="https://www.amazon.in/VOLTURI-Fridge-Storage-Boxes-Vegetables/dp/B09SHN6916/ref=sr_1_2_sspa?crid=2CFSOURX51NST&dib=eyJ2IjoiMSJ9.CGJXLNmwzNDfdv572FybsQM0WPTcpKIaIf0D-1UoJ1ME6UcALBCSFm96XzNOZb1-kmjJds3jutZhDDqv36atXCm9LSVevbiDFT-TEUO_MisZFXhH58p3s-D3E-l3tppF6w1vTAiI1NedVgRPnYiHqyulfpov4s-ClEFw5UY9uQgXmrb5zzfTnh39asciR8aqw5ApgwEE-AakiRpoINCJiKgBp5okrDrXxfqvjR0471k6VsT82SQ2EDeYDRkzbE0c6l6goiNEX4BgMGnPk7GRhTm3IzWF5-0AstbygOHR8wE.2S47jO8ISW2suaOdF5d5kHgvejUTL5bPtROnuNLSS9E&dib_tag=se&keywords=kitchen%2Bessentials&nsdOptOutParam=true&qid=1740897130&sprefix=kitchen%2Bessen%2Caps%2C288&sr=8-2-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&th=1" target="_blank"><button>Link</button></a></p>
+          <p><strong>Prestige LPG Gas Stove..</strong> &nbsp;<a href="https://www.amazon.in/Prestige-Toughened-Glass-Top-Ergonomic-Tri-Pin/dp/B08HNHNHSS/ref=sr_1_5?crid=3LI0XJELUAVR3&dib=eyJ2IjoiMSJ9.IrOj0HMXq2ynoXdzsXq0oW41jmgboosuTuMusezHBNaiaBg2rWI261PlybpODbndsIWDYLsRv0SGVYszXETdSK8YDR0PcrS-Meey4j6nX8VAg2140F18PSFaw4tpLVtfK6oMM59gVcCCXzUKaJR0JTHdH5phAnZq7vxJso67qv6TMEWaO0qHWmulcK91jWvLW_D5KKXFJ-7dI6bGn1dK2TmJsNKnWrVWc3-D6P9XE6flG_UWuQoN1y4GF-xBRhGfGEclON689k2Hc7YnMIuFJx6pQzgmpW2-qiTH_vOD9KbX3NA_KJZ7hvNcz1P13Ytm_b1S0m6y8wZKEjmq1g7-JwnLxsQot2nqDfU1MrqpzSHcOq1QqZ5Fw27NtnjzVveSPmYNxLDFqiAkpJ9Noub-4-eGbTxYEWFSXER6sXknAp6ttlXFivX86_zUYXklZIc_.uHBW_LQu7pmm7cDUtaDSS9bAoUtXTppSxwLKVOwkKOk&dib_tag=se&keywords=Prestige%2Bgas&nsdOptOutParam=true&qid=1740897505&sprefix=prestige%2Bgas%2Caps%2C385&sr=8-5&th=1" target="_blank"><button>Link</button></a></p>
+          <p><strong>Dish Washing Gloves..</strong>&nbsp; <a href="https://www.amazon.in/HUSB-Silicone-Cleaning-Dishwashing-Multicolour/dp/B092J6Q41C/ref=sr_1_44?crid=2GLEDDZCCJVRB&dib=eyJ2IjoiMSJ9.CGJXLNmwzNDfdv572FybsQM0WPTcpKIaIf0D-1UoJ1NsxSXrCymKVmf4pUAPvc2RDCGp-EHwcUx7FXmdl6I20Sm9LSVevbiDFT-TEUO_Miu3vGgrKeIiICy0dE3AT1rqU3zEa_xGwjjoIgTYg9-Zoyulfpov4s-ClEFw5UY9uQgXmrb5zzfTnh39asciR8aqZYaHPK-RX0kFrjvDKPlsvmIwRdtdv12NZYDSHo9NLpcYVnAqTg-dNftOYl2CdRpbKOVxUfTNnkI8dOk3ib1wvwupPeLP71mY-YuYKgAaBOSfNtpGhV-YzDfDeQ8DWdQzY7a4eGwkH2mrMxBBazYQaf3qtjb0k4EjxuPzMUOpFOG9Qmu_TTBPZlST-Dqa6_iOndmUwQGHVDAL_sXKYhj6h6dVNHcA-SRlrE16cXVqSwNfgR0FAIkSTuacNDennf0w.9ZvFwbtyj1LSwJvLcHZlqG4WBZyhlX7mCA5IK3lowKs&dib_tag=se&keywords=kitchen+essentials&nsdOptOutParam=true&qid=1740897634&sprefix=%2Caps%2C321&sr=8-44" target="_blank"><button>Link</button></a></p>
+          <p><strong>Panasonic Microwave Oven..</strong> &nbsp;<a href="https://www.amazon.in/Panasonic-Microwave-NN-ST310QBFG-Black-Menus/dp/B0D7MFQLJR/ref=sr_1_1_sspa?crid=C9ZFWQCZLYBC&dib=eyJ2IjoiMSJ9.nu4SPs3zUmccwmbUOARw7a2NXQzv4sS46SgKaA3liDnnpye5vM5liHQiR5-FFWlc3rkTy1qxiMUUIJ292ewUVX7qY2h1wG-6PiimrjMPJ0geCxuj3V7TqTAfi1NM1X3mdrwDPP4PgHzvC12SsDnfmiQrrZBLpXzEkTiytDeVagln2GSX5lhJfmV5PROWewpFoGurq2I4YB5O3EdCBxG-WTCYGdUNxGq1KmEtEUF8_xM.XIt16zkGasaEXCEnDQorH9w20XAimnIT8dORb8esosw&dib_tag=se&keywords=oven&qid=1740897809&sprefix=oven%2Caps%2C329&sr=8-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&th=1" target="_blank"><button>Link</button></a></p>
+          <p><strong>Bamboo Fibre Dinner Plates..</strong>&nbsp; <a href="https://www.amazon.in/Earthism-Eco-Friendly-Dinner-Plates-11/dp/B0BDF1GBD1/ref=sr_1_48?crid=342BXWII6OXAJ&dib=eyJ2IjoiMSJ9.5tRAGu7E-RpaJ0osGqBiWAEV0K0RqF-_X4zo12rS9VUXB9TOK5IEr9RfNMvTW_seC0EPsLbBXSoAXHw_S4VF0fDG95R0bdLzk9Ej1gSBq7pZ1y8Jud0dUXCjzuBDmnyLIySoORAaQBi38Y0oszETodIyuNwVmU6n2JNBTl7zKqsQBs8OVwiIYtMXqtoXM6-otNgZ9PB96rGizY7d85K6NaQ_bgiue-hcXEfr-gMG40RRE3veiO1KYLuhaB9486877sMafw77GPgnZwAx3ZQtJBHXc_gGyw7WwcNFtVr7tAaCvZcOv27UKFlB9okJ1JAqpKSZMTSU9eCMxfm02-B3CgXAU4JKokuNga6QYHLAgToNIrMYm01T5BYU2-fljmuJ3PX6N5WkK7cs7ckJQR0gZoU1twzJ2kIAAvOLxyzVXufcrDuygCptgF316I3SsAVV.9BYBCnM2L4Mf4NX3nwoMKHjgt2roCk8RzON9YROg6UQ&dib_tag=se&keywords=plates&qid=1740897923&sprefix=plate%2Caps%2C296&sr=8-48&th=1" target="_blank"><button>Link</button></a></p>
+          <p><strong>Whirlpool Refrigerator..</strong>&nbsp; <a href="https://www.amazon.in/Whirlpool-Refrigerator-205-WDE-CLS/dp/B0BSRVL2VV/ref=sr_1_3?crid=2F9F7EPUDQVXD&dib=eyJ2IjoiMSJ9.WeNO08BDbM9HwjBZfrKHXRLR2KCZTBhIWAeCt_RqvopYdJiqMf09eSnjGTjlhf8RmCxDb6zYsDcJ0JpYYrTlxxSpy-mREQMxV6cmB4EMMiYsksoMviWz-jFbN8qnZC7KExZbT5CdSvyJ1NeXwcAt_Mavmot1FWDvgGUgYoD4bDAQ2NTLu2YXtOokJaStOzS7Je3hYTU6sRTsTTGT10TdTDn50vMprQKOZRbPvXpLI84.yyWNRZ61e3Q31Hi32gPQsCy_oEO0O1VoZj_HE9Y65o8&dib_tag=se&keywords=fridge&qid=1740897581&sprefix=fridg%2Caps%2C298&sr=8-3&th=1" target="_blank"><button>Link</button></a></p>
+          <p><strong>Stainless Steel Knife Set..</strong> &nbsp;<a href="https://www.amazon.in/AmazonBasics-Stainless-High-carbon-Blades-Pieces/dp/B00R3Z49G6/ref=sr_1_22_sspa?crid=2GLEDDZCCJVRB&dib=eyJ2IjoiMSJ9.CGJXLNmwzNDfdv572FybsQM0WPTcpKIaIf0D-1UoJ1NsxSXrCymKVmf4pUAPvc2RDCGp-EHwcUx7FXmdl6I20Sm9LSVevbiDFT-TEUO_Miu3vGgrKeIiICy0dE3AT1rqU3zEa_xGwjjoIgTYg9-Zoyulfpov4s-ClEFw5UY9uQgXmrb5zzfTnh39asciR8aqZYaHPK-RX0kFrjvDKPlsvmIwRdtdv12NZYDSHo9NLpcYVnAqTg-dNftOYl2CdRpbKOVxUfTNnkI8dOk3ib1wvzm3IzWF5-0AstbygOHR8wE.wnbU9KEfrDvngl1EqUBK9SkjoByI_LNGNAqYJLW2EOo&dib_tag=se&keywords=kitchen%2Bessentials&nsdOptOutParam=true&qid=1740897634&sprefix=%2Caps%2C321&sr=8-22-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9tdGY&th=1" target="_blank"><button>Link</button></a></p>
+        </div>
+<!--        <div class="panel-footer">-->
+<!--          <h3>$29</h3>-->
+<!--          <h4>per month</h4>-->
+<!--          <button class="btn btn-lg">Sign Up</button>-->
+<!--        </div>-->
+      </div>
+    </div>
+    <div class="col-sm-4 col-xs-12">
+      <div class="panel panel-default text-center">
+        <div class="panel-heading">
+          <h1>Skin care</h1>
+        </div>
+        <div class="panel-body">
+          <p><strong>CeraVe Skin Cleanser..</strong> &nbsp;<a href="https://www.amazon.in/CeraVe-Hydrating-Non-Foaming-Hyaluronic-Ceramides/dp/B07C5XPXDC/ref=sr_1_2_sspa?crid=AYD1D0N84VA7&dib=eyJ2IjoiMSJ9.YEmPiHeVMXEYZQ4JTaS7oc-gXjSnDxrcjatxdczz5yd7jATgxtCCcDbLnDKloeNK7q5IKBvuqTJXDExuMtonwq7iBE12W0t0iy-c-n2zW__jeVqdivLCLHkOVpWsQRRadfdnBuAB9tFNeJdBNAkwPZTxcMGZPF1iZyptQxHUioqKwso6F85p_kewIax_Pj8pmKq0Ys5UIoi8Du6INQN_6eRcAk_8nCYjrM_fwIrngRp0N2kUbKUKFzvp373sRY89qJDEFCV_Aeul95X5O61JG34E7y8rKJ99CcPa2yQ_mpc.YCpLVp1z4ShQWv12zlm6KmSqvAEGviDZ_E4qcN415BA&dib_tag=se&keywords=skin+care&nsdOptOutParam=true&qid=1740902755&sprefix=skin+care%2Caps%2C344&sr=8-2-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1" target="_blank"><button>Link</button></a></p>
+          <p><strong>Olay Retinol Night Cream..</strong> <a href="https://www.amazon.in/Olay-Night-Serum-Regenerist-Retinol/dp/B08698SL3W/ref=sr_1_4_sspa?crid=AYD1D0N84VA7&dib=eyJ2IjoiMSJ9.YEmPiHeVMXEYZQ4JTaS7oc-gXjSnDxrcjatxdczz5yd7jATgxtCCcDbLnDKloeNK7q5IKBvuqTJXDExuMtonwq7iBE12W0t0iy-c-n2zW__jeVqdivLCLHkOVpWsQRRadfdnBuAB9tFNeJdBNAkwPZTxcMGZPF1iZyptQxHUioqKwso6F85p_kewIax_Pj8pmKq0Ys5UIoi8Du6INQN_6eRcAk_8nCYjrM_fwIrngRp0N2kUbKUKFzvp373sRY89qJDEFCV_Aeul95X5O61JG34E7y8rKJ99CcPa2yQ_mpc.YCpLVp1z4ShQWv12zlm6KmSqvAEGviDZ_E4qcN415BA&dib_tag=se&keywords=skin+care&nsdOptOutParam=true&qid=1740902755&sprefix=skin+care%2Caps%2C344&sr=8-4-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1" target="_blank"><button>Link</button></a></p>
+          <p><strong>Cosrx Advanced Snail Mucin..</strong> <a href="https://www.amazon.in/Cosrx-Advanced-Snail-Mucin-Essence/dp/B00PBX3L7K/ref=sr_1_7?crid=DY241DSIACIS&dib=eyJ2IjoiMSJ9.93GFYxs3B3z9Kn93iqdAfM-gXjSnDxrcjatxdczz5yfIJgXdSK7dwUdIp_7FKpi73ljD0vOdP8pdjVgNim9x-WGlZi4Q0t7CbljDkgcxqau9EWMpPX0mvwcO_zT-CCS1fCEk1sKe4XD8KKUUn4R_pL-2ZsHvwVGO0F-x0hxLSEe-pmINRDCRBAmTN14Xab-TwVL9cEs-PQwmAyEVfsrKnkTNGXETqpJVkr7Si62ip6pZbHdDc3RELUHOqt_8kerPIv3j1nb_44BRUdrA-05apio8nJziiPcppe1CE1PElHA.B77OrW0r7_E_d_kNqA7-RCFRATWeTAWJ5VSirsqF3Xk&dib_tag=se&keywords=skin+care&qid=1743658011&sprefix=skin+care%2Caps%2C786&sr=8-7"><button>Link</button></a></p>
+          <p><strong>Plum Green Tea Night Gel..</strong> <a href="https://www.amazon.in/Hydrates-Lightweight-Quick-Absorbing-Non-Sticky-Acne-Prone/dp/B0B9X1RNTL/ref=sr_1_10?crid=DY241DSIACIS&dib=eyJ2IjoiMSJ9.93GFYxs3B3z9Kn93iqdAfM-gXjSnDxrcjatxdczz5yfIJgXdSK7dwUdIp_7FKpi73ljD0vOdP8pdjVgNim9x-WGlZi4Q0t7CbljDkgcxqau9EWMpPX0mvwcO_zT-CCS1fCEk1sKe4XD8KKUUn4R_pL-2ZsHvwVGO0F-x0hxLSEe-pmINRDCRBAmTN14Xab-TwVL9cEs-PQwmAyEVfsrKnkTNGXETqpJVkr7Si62ip6pZbHdDc3RELUHOqt_8kerPIv3j1nb_44BRUdrA-05apio8nJziiPcppe1CE1PElHA.B77OrW0r7_E_d_kNqA7-RCFRATWeTAWJ5VSirsqF3Xk&dib_tag=se&keywords=skin+care&qid=1743658011&sprefix=skin+care%2Caps%2C786&sr=8-10"><button>Link</button></a></p>
+          <p><strong>The Derma Co Sunscreen gel..</strong> <a href="https://www.amazon.in/Derma-Co-Hyaluronic-Sunscreen-Protection/dp/B095CRM8NF/ref=sr_1_12?crid=DY241DSIACIS&dib=eyJ2IjoiMSJ9.93GFYxs3B3z9Kn93iqdAfM-gXjSnDxrcjatxdczz5yfIJgXdSK7dwUdIp_7FKpi73ljD0vOdP8pdjVgNim9x-WGlZi4Q0t7CbljDkgcxqau9EWMpPX0mvwcO_zT-CCS1fCEk1sKe4XD8KKUUn4R_pL-2ZsHvwVGO0F-x0hxLSEe-pmINRDCRBAmTN14Xab-TwVL9cEs-PQwmAyEVfsrKnkTNGXETqpJVkr7Si62ip6pZbHdDc3RELUHOqt_8kerPIv3j1nb_44BRUdrA-05apio8nJziiPcppe1CE1PElHA.B77OrW0r7_E_d_kNqA7-RCFRATWeTAWJ5VSirsqF3Xk&dib_tag=se&keywords=skin%2Bcare&qid=1743658011&sprefix=skin%2Bcare%2Caps%2C786&sr=8-12&th=1"><button>Link</button></a></p>
+          <p><strong>Emolene Moisturising Cream..</strong> <a href="https://www.amazon.in/Emolene-Moisturizing-Hydronourish-Non-Comedogenic-Hypoallergenic/dp/B086572K3N/ref=sr_1_18?brandId=berry&crid=DY241DSIACIS&dib=eyJ2IjoiMSJ9.93GFYxs3B3z9Kn93iqdAfM-gXjSnDxrcjatxdczz5yfIJgXdSK7dwUdIp_7FKpi73ljD0vOdP8pdjVgNim9x-WGlZi4Q0t7CbljDkgcxqau9EWMpPX0mvwcO_zT-CCS1fCEk1sKe4XD8KKUUn4R_pL-2ZsHvwVGO0F-x0hxLSEe-pmINRDCRBAmTN14Xab-TwVL9cEs-PQwmAyEVfsrKnkTNGXETqpJVkr7Si62ip6pZbHdDc3RELUHOqt_8kerPIv3j1nb_44BRUdrA-05apio8nJziiPcppe1CE1PElHA.B77OrW0r7_E_d_kNqA7-RCFRATWeTAWJ5VSirsqF3Xk&dib_tag=se&keywords=skin+care&qid=1743658011&sprefix=skin+care%2Caps%2C786&sr=8-18"><button>Link</button></a></p>
+          <p><strong>Garnier Skin Naturals Face Serum..</strong> <a href="https://www.amazon.in/Garnier-Light-Complete-VITAMIN-Booster/dp/B08FTQXWC7/ref=sr_1_20?crid=DY241DSIACIS&dib=eyJ2IjoiMSJ9.93GFYxs3B3z9Kn93iqdAfM-gXjSnDxrcjatxdczz5yfIJgXdSK7dwUdIp_7FKpi73ljD0vOdP8pdjVgNim9x-WGlZi4Q0t7CbljDkgcxqau9EWMpPX0mvwcO_zT-CCS1fCEk1sKe4XD8KKUUn4R_pL-2ZsHvwVGO0F-x0hxLSEe-pmINRDCRBAmTN14Xab-TwVL9cEs-PQwmAyEVfsrKnkTNGXETqpJVkr7Si62ip6pZbHdDc3RELUHOqt_8kerPIv3j1nb_44BRUdrA-05apio8nJziiPcppe1CE1PElHA.B77OrW0r7_E_d_kNqA7-RCFRATWeTAWJ5VSirsqF3Xk&dib_tag=se&keywords=skin%2Bcare&qid=1743658011&sprefix=skin%2Bcare%2Caps%2C786&sr=8-20&th=1"><button>Link</button></a></p>
+          <p><strong>LANEIGE Sleeping Mask..</strong> <a href="https://www.amazon.in/LANEIGE-Sleeping-Collagen-Boosting-Hydration/dp/B0CZYK1YHY/ref=sr_1_21_sspa?crid=DY241DSIACIS&dib=eyJ2IjoiMSJ9.93GFYxs3B3z9Kn93iqdAfM-gXjSnDxrcjatxdczz5yfIJgXdSK7dwUdIp_7FKpi73ljD0vOdP8pdjVgNim9x-WGlZi4Q0t7CbljDkgcxqau9EWMpPX0mvwcO_zT-CCS1fCEk1sKe4XD8KKUUn4R_pL-2ZsHvwVGO0F-x0hxLSEe-pmINRDCRBAmTN14Xab-TwVL9cEs-PQwmAyEVfsrKnkTNGXETqpJVkr7Si62ip6pZbHdDc3RELUHOqt_8kerPIv3j1nb_44BRUdrA-05apio8nJziiPcppe1CE1PElHA.B77OrW0r7_E_d_kNqA7-RCFRATWeTAWJ5VSirsqF3Xk&dib_tag=se&keywords=skin%2Bcare&qid=1743658011&sprefix=skin%2Bcare%2Caps%2C786&sr=8-21-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9tdGY&th=1"><button>Link</button></a></p>
+          <p><strong>Foxtale De-Tan Face Mask..</strong> <a href="https://www.amazon.in/Foxtale-Glowing-Reduction-Blackheads-Brightening/dp/B0D2RQMS7Q/ref=sr_1_27?crid=DY241DSIACIS&dib=eyJ2IjoiMSJ9.93GFYxs3B3z9Kn93iqdAfM-gXjSnDxrcjatxdczz5yfIJgXdSK7dwUdIp_7FKpi73ljD0vOdP8pdjVgNim9x-WGlZi4Q0t7CbljDkgcxqau9EWMpPX0mvwcO_zT-CCS1fCEk1sKe4XD8KKUUn4R_pL-2ZsHvwVGO0F-x0hxLSEe-pmINRDCRBAmTN14Xab-TwVL9cEs-PQwmAyEVfsrKnkTNGXETqpJVkr7Si62ip6pZbHdDc3RELUHOqt_8kerPIv3j1nb_44BRUdrA-05apio8nJziiPcppe1CE1PElHA.B77OrW0r7_E_d_kNqA7-RCFRATWeTAWJ5VSirsqF3Xk&dib_tag=se&keywords=skin%2Bcare&qid=1743658011&sprefix=skin%2Bcare%2Caps%2C786&sr=8-27&th=1"><button>Link</button></a></p>
+
+        </div>
+<!--        <div class="panel-footer">-->
+<!--          <h3>$49</h3>-->
+<!--          <h4>per month</h4>-->
+<!--          <button class="btn btn-lg">Sign Up</button>-->
+<!--        </div>-->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Container (Contact Section) -->
+<div id="contact" class="container-fluid bg-grey">
+  <h2 class="text-center">CONTACT</h2>
+  <div class="row">
+    <div class="col-sm-5">
+      <p>Contact us and we'll get back to you within 24 hours.</p>
+      <p><span class="glyphicon glyphicon-map-marker"></span> Ranchi, India</p>
+      <p><span class="glyphicon glyphicon-phone"></span> +00 1515151515</p>
+      <p><span class="glyphicon glyphicon-envelope"></span> myemail@something.com</p>
+    </div>
+<!--    <div class="col-sm-7 slideanim">-->
+<!--      <div class="row">-->
+<!--        <div class="col-sm-6 form-group">-->
+<!--          <input class="form-control" id="name" name="name" placeholder="Name" type="text" required>-->
+<!--        </div>-->
+<!--        <div class="col-sm-6 form-group">-->
+<!--          <input class="form-control" id="email" name="email" placeholder="Email" type="email" required>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--      <textarea class="form-control" id="comments" name="comments" placeholder="Comment" rows="5"></textarea><br>-->
+<!--      <div class="row">-->
+<!--        <div class="col-sm-12 form-group">-->
+<!--          <button class="btn btn-default pull-right" type="submit">Send</button>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+  </div>
+</div>
+
+<!-- Image of location/map -->
+<img src="/w3images/map.jpg" class="w3-image w3-greyscale-min" style="width:100%">
+
+<footer class="container-fluid text-center">
+  <a href="#myPage" title="To Top">
+    <span class="glyphicon glyphicon-chevron-up"></span>
+  </a>
+  <p>Project Made By Nitish Kumar Saw and Priyanka Kumari</p>
+</footer>
+
+<script>
+$(document).ready(function(){
+  // Add smooth scrolling to all links in navbar + footer link
+  $(".navbar a, footer a[href='#myPage']").on('click', function(event) {
+    // Make sure this.hash has a value before overriding default behavior
+    if (this.hash !== "") {
+      // Prevent default anchor click behavior
+      event.preventDefault();
+
+      // Store hash
+      var hash = this.hash;
+
+      // Using jQuery's animate() method to add smooth page scroll
+      // The optional number (900) specifies the number of milliseconds it takes to scroll to the specified area
+      $('html, body').animate({
+        scrollTop: $(hash).offset().top
+      }, 900, function(){
+
+        // Add hash (#) to URL when done scrolling (default click behavior)
+        window.location.hash = hash;
+      });
+    } // End if
+  });
+
+  $(window).scroll(function() {
+    $(".slideanim").each(function(){
+      var pos = $(this).offset().top;
+
+      var winTop = $(window).scrollTop();
+        if (pos < winTop + 600) {
+          $(this).addClass("slide");
+        }
+    });
+  });
+})
+</script>
+
+</body>
+</html>
